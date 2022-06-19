@@ -1,9 +1,6 @@
 import express from "express";
 import cors from "cors";
 
-
-
-
 const server = express();
 server.use(cors());
 
@@ -104,17 +101,25 @@ let tweets = [
 server.use(express.json());
 
 server.post('/sign-up', (request, response) => {
-    
-    const usuarioCadastrado = usuarios.find((usuario) =>{
-        request.body.username === usuario.username
-    });
-    if(usuarioCadastrado){
-        console.log("esse usuario ja existe");
+
+    if(request.body.username && request.body.avatar){
+
+        const usuarioCadastrado = usuarios.find((usuario) =>{
+            request.body.username === usuario.username
+        });
+        if(usuarioCadastrado){
+            response.status(400).send("Usuário existente");
+        }
+        else{
+            usuarios.push(request.body);
+            response.status(201).send("OK");
+        }
     }
     else{
-        usuarios.push(request.body);
-        response.send("OK");
+        response.status(400).send("Todos os campos são obrigatórios!");
     }
+    
+    
 });
 
 server.get('/tweets', (request, response) =>{
@@ -134,19 +139,24 @@ server.get('/tweets', (request, response) =>{
 });
 
 server.post('/tweets', (request, response) => {
-
-    let tweet = {
-        username: request.body.username, 
-        tweet: request.body.tweet
+    if(request.body.username && request.body.tweet){
+        let tweet = {
+            username: request.body.username, 
+            tweet: request.body.tweet
+        }
+    
+        const msg = usuarios.find(
+            (user) => user.username === tweet.username
+        );
+    
+        tweet = {...tweet, avatar: msg.avatar};
+        tweets.push(tweet);
+        response.status(201).send("OK");
     }
-
-    const msg = usuarios.find(
-        (user) => user.username === tweet.username
-    );
-
-    tweet = {...tweet, avatar: msg.avatar};
-    tweets.push(tweet);
-    response.send("OK");
+    else{
+        response.status(400).send("Todos os campos são obrigatórios!");
+    }
+    
 } )
 
 server.listen(5000);

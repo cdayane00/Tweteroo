@@ -118,11 +118,19 @@ server.post('/sign-up', (request, response) => {
 });
 
 server.get('/tweets', (request, response) =>{
-    const ultimos = 10;
-    const primeiro = tweets.length - ultimos;
-    const ultimo = tweets.length;
+    if(tweets.length <= 10){
+        const primeiro = 0;
+        const ultimo = tweets.length;
+        response.send(tweets.slice(primeiro,ultimo).reverse());
+    }
+    else{
+        const ultimos = 10;
+        const primeiro = tweets.length - ultimos;
+        const ultimo = tweets.length;
+        
+        response.send(tweets.slice(primeiro,ultimo).reverse());
+    }
     
-    response.send(tweets.slice(primeiro,ultimo).reverse());
 });
 
 server.post('/tweets', (request, response) => {
